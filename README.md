@@ -228,9 +228,55 @@ plot_simulation(
   model_sens, scenario = "sensitivity", take_all = TRUE,
   to = "2028-01-01", expressions = c("Y")
 )
+
+plot_simulation_g(
+  model_sens, scenario = "sensitivity", take_all = TRUE,
+  to = "2028-01-01", expressions = c("Y")
+)
 ```
 
 ![Sensitivity](man/figures/images/Sensitivity.png)
+
+In order to calculate many parameters at once following method is advisable:
+
+First create list with parameters and their limits
+```
+params <- list(
+  'alpha1' =  data.frame('name' = 'alpha1', 'from' = 0.1, 'to' = 0.8, 'step' = 0.1),
+  'alpha2' = data.frame('name' = 'alpha2', 'from' = 0.1, 'to' = 0.6, 'step' = 0.1)
+  )
+```
+
+Then create function
+
+```
+sensivity <- function(model, x){
+
+  model_sens <- 
+    create_sensitivity(model,
+                        variable = x$nazwa, lower = x$from, upper = x$to, step = x$step) |>
+    simulate_scenario(periods = 50)
+}
+```
+
+and pass it to `purrr::map()`:
+```
+result <- purrr::map(params, \(x) sensivity(model_sim ,x))
+```
+
+The result object is a list with all simulated scenarios for a given parameter which can be plotted like this:
+```
+plot_simulation(
+  result[[1]], scenario = "sensitivity", take_all = TRUE,
+  to = "2028-01-01", expressions = c("Y")
+)
+```
+or this way for publication:
+```
+plt <- purrr::map(wynik, \(x) plot_simulation_g(model = x, scenario = "sensitivity", take_all = TRUE, to = "2028-01-01", expressions = c("Y")))
+plts <- patchwork::wrap_plots(plt, ncol = 2)
+```
+
 
 ### Other examples ⭐
 
