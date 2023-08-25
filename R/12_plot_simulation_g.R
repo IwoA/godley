@@ -137,7 +137,7 @@ plot_simulation_g <- function(model,
       geom_line(aes(linetype = scenario)) +
       #geom_point(aes(shape = var_name), size = 3) +
       ggrepel::geom_text_repel(data=subset(r, time == max(r$time)), 
-                               aes(x = time +30, 
+                               aes(x = time, 
                                    label = paste(var_name, round(value, 2))
                                ),
                                size = rel(3),
