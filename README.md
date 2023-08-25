@@ -248,7 +248,7 @@ params <- list(
   )
 ```
 
-Then create function
+Then create function combining creation and simulation of sensivity scenarios.
 
 ```         
 sensivity <- function(model, x){
