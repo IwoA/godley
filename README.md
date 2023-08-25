@@ -282,6 +282,8 @@ plts <- patchwork::wrap_plots(plt, nrow = 2)
 plts
 ```
 
+![Multiple Sensivity plots](man/figures/images/multiple_sensivity.png)
+
 ### Other examples ⭐
 
 [Here](https://gamrot.github.io/godley/) you can find more details about package functions and other models created with `godley`.
