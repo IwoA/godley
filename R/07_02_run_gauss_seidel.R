@@ -50,7 +50,7 @@ run_gauss_seidel <- function(m,
 
         if (is.na(m[.i, .id]) | !is.finite(m[.i, .id])) {
           stop("Gauss-Seidel algorithm failed
-During computation NaN or Inf was obtained in ", .id, " equation
+During computation NaN or Inf was obtained in ", exprs[[.id]], " equation
 Please check if equations are correctly specified or change initial values")
         }
       } else { # If cyclical block, use Gauss-Seidel algorithm
