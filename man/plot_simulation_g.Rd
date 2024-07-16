@@ -36,15 +36,15 @@ plot_simulation_g(
 ggplot2 plot
 }
 \description{
-Returns ggplot2 plots which could be further tweaked.
+Returns ggplot2 plot which could be further tweaked.
 }
 \details{
 This functions is created to help preparing publication ready plots. As any normal ggplot2 plot it can be
 modified using any function from the ggplot2 universe.
 
-`expressions` allows to create own variables like "W/Y"
+#' To remove unnecessary legends use + guides(colour = "none", linetype = "none") after the function call.
 
-To remove unnecessary legends use + guides(colour = "none", linetype = "none") after the function call.
+`expressions` allows to create own variables like "W/Y". It works for plot_simulation() too.
 }
 \seealso{
 [plot_simulation()] for interactive plots best for model testing.
