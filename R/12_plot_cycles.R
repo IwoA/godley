@@ -19,59 +19,39 @@
 plot_cycles <- function(model, save_file = NULL) {
   # argument check
   # type
-  checkmate::assert_class(model, "SFC")
-  checkmate::assert_logical(info)
-  checkmate::assert_character(save_file, len = 1, null.ok = TRUE)
-  
-  # Check correctness of equations entered by the user
-  res <- godley:::validate_model_input(model, info = FALSE)
-  equations_sep <- res[[1]]
-  variables_exo <- res[[2]]
-  functions <- res[[3]]
-  
-  # Prepare them for the simulation process
-  km <- godley:::find_adjacency(equations_sep)
-  
-  # Find cycles in model
-  blocks <- unique(sort(calls$block))
-  equations_id <- lapply(blocks, function(x) calls[, "id"][calls[, "block"] == x])
-  cycles <- equations_id[lapply(equations_id, length) > 1]
-  
-  for (i in seq_along(cycles)) {
-    #cycles[[i]] <- filter(calls, id %in% cycles[[i]]) |> pull(lhs)
-    cycles[[i]] <- calls[calls$id %in% cycles[[i]],]$lhs
-  }
-  
-  # Teraz można pokolorować wierzchołki w zależności od tego, w której pętli są
-  
-  # Prepare igraph
-  graph <- igraph::graph_from_adjacency_matrix(km, mode = "directed")
-  
-  # plotting
-  # plot(graph, layout = igraph::layout_with_fr(graph))
-  # tkplot(graph)
-  
-  # plotting in visNetwork
-  visgraph <- visNetwork::toVisNetworkData(graph)
-  visgraph$edges$arrows = "from"
-  visgraph$nodes$title = visgraph$nodes$id
-  visgraph$nodes <- visgraph$nodes[c("id", "title")]
-  visgraph$nodes$group <- "X"
-  for (i in seq_along(cycles)) {
-    visgraph$nodes$group[visgraph$nodes$id %in% cycles[[i]]] <- LETTERS[i]
-  }
-  
-  network <- visNetwork::visNetwork(visgraph$nodes, visgraph$edges, width = "100%", height = "600px") |>
+    checkmate::assert_class(model, "SFC")
+    checkmate::assert_character(save_file, len = 1, null.ok = TRUE)
+    res <- godley:::validate_model_input(model, info = FALSE)
+    equations_sep <- res[[1]]
+    variables_exo <- res[[2]]
+    functions <- res[[3]]
+    calls <- attr(model$prepared, "calls")
     
-    visNetwork::visOptions(highlightNearest = list(enabled = T, hover = T), 
-                           nodesIdSelection = T,
-                           selectedBy = list(variable = "group"))
-  
-  if (!is.null(save_file)) {
-    if (!grepl(".html$", save_file)) {
-      save_file <- paste0(save_file, ".html")
+    km <- godley:::find_adjacency(equations_sep)
+    blocks <- unique(sort(calls$block))
+    equations_id <- lapply(blocks, function(x) calls[, "id"][calls[, 
+                                                                   "block"] == x])
+    cycles <- equations_id[lapply(equations_id, length) > 1]
+    for (i in seq_along(cycles)) {
+      cycles[[i]] <- calls[calls$id %in% cycles[[i]], ]$lhs
     }
-    visNetwork::visSave(network, file = save_file)
+    graph <- igraph::graph_from_adjacency_matrix(km, mode = "directed")
+    visgraph <- visNetwork::toVisNetworkData(graph)
+    visgraph$edges$arrows = "from"
+    visgraph$nodes$title = visgraph$nodes$id
+    visgraph$nodes <- visgraph$nodes[c("id", "title")]
+    visgraph$nodes$group <- "X"
+    for (i in seq_along(cycles)) {
+      visgraph$nodes$group[visgraph$nodes$id %in% cycles[[i]]] <- LETTERS[i]
+    }
+    network <- visNetwork::visOptions(visNetwork::visNetwork(visgraph$nodes, 
+                                                             visgraph$edges, width = "100%", height = "600px"), highlightNearest = list(enabled = T, 
+                                                                                                                                        hover = T), nodesIdSelection = T, selectedBy = list(variable = "group"))
+    if (!is.null(save_file)) {
+      if (!grepl(".html$", save_file)) {
+        save_file <- paste0(save_file, ".html")
+      }
+      visNetwork::visSave(network, file = save_file)
+    }
+    return(network)
   }
-  return(network)
-}
